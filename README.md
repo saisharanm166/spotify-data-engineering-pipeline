@@ -1,5 +1,4 @@
 # spotify-data-engineering-pipeline
-# Spotify Data Engineering Pipeline
 
 ## 📌 Project Overview
 
