@@ -365,15 +365,6 @@ spotify-data-engineering-pipeline/
 │
 ├── transform/
 │   └── spotify_transform.py
-│
-├── sql/
-│   └── athena_queries.sql
-│
-├── architecture/
-│   └── architecture.png
-│
-└── .gitignore
-```
 
 ---
 
