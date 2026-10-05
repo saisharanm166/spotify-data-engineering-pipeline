@@ -1,0 +1,60 @@
+import json
+import requests
+import os
+import boto3
+from datetime import datetime
+
+def get_access_token():
+
+    client_id = os.environ.get('client_id')
+    client_secret = os.environ.get('client_secret')
+    refresh_token = os.environ.get('refresh_token')
+
+    response = requests.post(
+        "https://accounts.spotify.com/api/token",
+        data={
+            "grant_type": "refresh_token",
+            "refresh_token": refresh_token
+        },
+        auth=(client_id, client_secret),
+        timeout=10
+    )
+
+    response.raise_for_status()
+
+    token_data = response.json()
+
+    return token_data["access_token"]
+
+
+def lambda_handler(event, context):
+
+    playlist_id = os.environ.get('playlist_id')
+
+    # Get new access token using refresh token
+    access_token = get_access_token()
+
+    # Call Spotify Playlist API
+    response = requests.get(
+        f"https://api.spotify.com/v1/playlists/{playlist_id}/items",
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        },
+        params={
+            "limit": 50
+        },
+        timeout=10
+    )
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    #return {
+    #    "statusCode": 200,
+     #   "body": json.dumps(data)
+    #}
+    filename="spotify_row_" +str(datetime.now()) + ".json"
+
+    client=boto3.client('s3')
+    client.put_object(Bucket='spotify-etl-project-saisharan', Key='raw_data/to_processed/' + filename, Body=json.dumps(data))
